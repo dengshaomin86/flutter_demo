@@ -1,0 +1,1 @@
+const serviceUrl = "http://192.168.5.122:3002";

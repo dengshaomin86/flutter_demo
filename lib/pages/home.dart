@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'toast.dart';
+import '../api/home.dart';
 
 class HomePage extends StatefulWidget {
   @override
-  _State createState() => new _State();
+  _HomePageState createState() => new _HomePageState();
 }
 
-class _State extends State<HomePage> {
+class _HomePageState extends State<HomePage> {
   TextEditingController typeController = TextEditingController();
   String showText = '输入内容：';
 
@@ -30,8 +32,12 @@ class _State extends State<HomePage> {
                   autofocus: false, // 关掉自动对焦
                 ),
                 RaisedButton(
-                  onPressed: _choiceAction,
-                  child: Text("sure"),
+                  onPressed: _getAction,
+                  child: Text("get"),
+                ),
+                RaisedButton(
+                  onPressed: _postAction,
+                  child: Text("post"),
                 ),
                 Text(
                   showText,
@@ -55,14 +61,30 @@ class _State extends State<HomePage> {
     );
   }
 
-  void _choiceAction() {
-    print('开始输入');
+  void _getAction() {
+    ToastCustomer.show("test");
+
     if (typeController.text.toString() == '') {
       showDialog(
           context: context,
           builder: (context) => AlertDialog(title: Text("不能为空")));
     } else {
-      getHttp(typeController.text.toString()).then((value) {
+      getHomePageContent(typeController.text.toString()).then((value) {
+        setState(() {
+          print(value);
+          showText = value["list"][0];
+        });
+      });
+    }
+  }
+
+  void _postAction() {
+    if (typeController.text.toString() == '') {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(title: Text("不能为空")));
+    } else {
+      postHttp(typeController.text.toString()).then((value) {
         setState(() {
           print(value);
           showText = "test";
@@ -75,38 +97,54 @@ class _State extends State<HomePage> {
   Future getHttp(String text) async {
     try {
       Response response;
-      var data = {text: text};
-      response = await Dio().get("http://127.0.0.1:3002/checkOnline",
+      var data = {"text": text};
+      response = await Dio().get("http://192.168.5.122:3002/flutter/getList",
           queryParameters: data);
-      print(response);
       return response.data;
     } catch (e) {
       return print(e);
     }
   }
-}
 
-class HomePage2 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    getHttp();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("首页"),
-      ),
-      body: Center(
-        child: Text("首页"),
-      ),
-    );
-  }
-
-  void getHttp() async {
+  Future postHttp(String text) async {
     try {
       Response response;
-      response = await Dio().get("http://139.9.50.13:3000/chat/getChatList");
-      return print(response);
+      var data = {"text": text};
+      response = await Dio().post("http://192.168.5.122:3002/flutter/postList",
+          queryParameters: data);
+      return response.data;
     } catch (e) {
       return print(e);
     }
+  }
+
+  void showMySimpleDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return new SimpleDialog(
+            title: new Text("SimpleDialog"),
+            children: <Widget>[
+              new SimpleDialogOption(
+                child: new Text("SimpleDialogOption One"),
+                onPressed: () {
+                  Navigator.of(context).pop("SimpleDialogOption One");
+                },
+              ),
+              new SimpleDialogOption(
+                child: new Text("SimpleDialogOption Two"),
+                onPressed: () {
+                  Navigator.of(context).pop("SimpleDialogOption Two");
+                },
+              ),
+              new SimpleDialogOption(
+                child: new Text("SimpleDialogOption Three"),
+                onPressed: () {
+                  Navigator.of(context).pop("SimpleDialogOption Three");
+                },
+              ),
+            ],
+          );
+        });
   }
 }
