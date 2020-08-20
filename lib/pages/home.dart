@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'toast.dart';
 import '../api/home.dart';
 
 class HomePage extends StatefulWidget {
@@ -35,10 +33,6 @@ class _HomePageState extends State<HomePage> {
                   onPressed: _getAction,
                   child: Text("get"),
                 ),
-                RaisedButton(
-                  onPressed: _postAction,
-                  child: Text("post"),
-                ),
                 Text(
                   showText,
                   overflow: TextOverflow.ellipsis,
@@ -62,8 +56,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _getAction() {
-    ToastCustomer.show("test");
-
     if (typeController.text.toString() == '') {
       showDialog(
           context: context,
@@ -76,75 +68,5 @@ class _HomePageState extends State<HomePage> {
         });
       });
     }
-  }
-
-  void _postAction() {
-    if (typeController.text.toString() == '') {
-      showDialog(
-          context: context,
-          builder: (context) => AlertDialog(title: Text("不能为空")));
-    } else {
-      postHttp(typeController.text.toString()).then((value) {
-        setState(() {
-          print(value);
-          showText = "test";
-        });
-      });
-    }
-  }
-
-  // Future 可以使用 then 链式操作
-  Future getHttp(String text) async {
-    try {
-      Response response;
-      var data = {"text": text};
-      response = await Dio().get("http://192.168.5.122:3002/flutter/getList",
-          queryParameters: data);
-      return response.data;
-    } catch (e) {
-      return print(e);
-    }
-  }
-
-  Future postHttp(String text) async {
-    try {
-      Response response;
-      var data = {"text": text};
-      response = await Dio().post("http://192.168.5.122:3002/flutter/postList",
-          queryParameters: data);
-      return response.data;
-    } catch (e) {
-      return print(e);
-    }
-  }
-
-  void showMySimpleDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return new SimpleDialog(
-            title: new Text("SimpleDialog"),
-            children: <Widget>[
-              new SimpleDialogOption(
-                child: new Text("SimpleDialogOption One"),
-                onPressed: () {
-                  Navigator.of(context).pop("SimpleDialogOption One");
-                },
-              ),
-              new SimpleDialogOption(
-                child: new Text("SimpleDialogOption Two"),
-                onPressed: () {
-                  Navigator.of(context).pop("SimpleDialogOption Two");
-                },
-              ),
-              new SimpleDialogOption(
-                child: new Text("SimpleDialogOption Three"),
-                onPressed: () {
-                  Navigator.of(context).pop("SimpleDialogOption Three");
-                },
-              ),
-            ],
-          );
-        });
   }
 }
