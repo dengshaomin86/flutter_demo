@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../api/home.dart';
+import '../components/swiper.dart';
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   @override
@@ -21,6 +23,27 @@ class _HomePageState extends State<HomePage> {
           child: Container(
             child: Column(
               children: [
+                FutureBuilder(
+                  future: getHomePageContent("test"),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      var slides = snapshot.data['slides'];
+                      print("slides==============>${slides}");
+                      List<Map> swiper = (slides as List).cast();
+                      print("swiper==============>${swiper}");
+                      return Column(
+                        children: [
+                          SwiperDiy(swiperData:swiper)
+                        ],
+                      );
+                    } else {
+                      print('none data');
+                      return Center(
+                        child: Text('加载中...'),
+                      );
+                    }
+                  },
+                ),
                 TextField(
                   controller: typeController,
                   decoration: InputDecoration(
